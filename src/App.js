@@ -6,10 +6,9 @@ import './App.css';
 import _ from 'underscore';
 
 const Stars = (props) => {
-const numberOfStars = 1 + Math.floor(Math.random()*9);
 
 let stars = [];
-for(let i=0; i<numberOfStars; i++)
+for(let i=0; i<props.numberOfStars; i++)
    stars.push(<i key={i} className="fa fa-star"></i>);
 return(
 <div className="col-5">
@@ -21,7 +20,7 @@ return(
 const Button = (props) => {
 return(
 <div className="col-2">
-  <button>=</button>
+  <button className="btn" disabled={props.selectNumbers.length === 0}>=</button>
 </div>
 )
 }
@@ -29,7 +28,7 @@ return(
 const Answer = (props) => {
 return(
 <div className="col-2">
-  {props.selectNumbers.map((numbers,i) => <span key={i}>{numbers}</span>)}
+  {props.selectNumbers.map((numbers,i) => <span key={i} onClick={() => props.unselect(numbers)}>{numbers}</span>)}
 </div>
 )
 }
@@ -52,25 +51,34 @@ Number.list = _.range(1,10);
 
 class Game extends React.Component {
     state = {
-        selectNumbers : [2,5]
+        selectNumbers : [],
+        numberOfStars : 1 + Math.floor(Math.random()*9)
     }
 selectNumber = (clickNumber) => {
+    if(this.state.selectNumbers.indexOf(clickNumber) >= 0){return;}
     this.setState(prevState => (
     {selectNumbers : prevState.selectNumbers.concat(clickNumber)}
     ));
 }
 
+unselect = (clickNumber) => {
+    this.setState(prevState => ({
+        selectNumbers : prevState.selectNumbers.filter(number => number !== clickNumber)
+    }));
+}
+
 render(){
+    const{selectNumbers, numberOfStars} = this.state;
 return(
 <div>
   <h3>Play Nine</h3>
   <div className="row">
-    <Stars />
-    <Button />
-    <Answer selectNumbers = {this.state.selectNumbers}/>
+    <Stars numberOfStars = {numberOfStars}/>
+    <Button selectNumbers = {selectNumbers}/>
+    <Answer selectNumbers = {selectNumbers} unselect={this.unselect}/>
   </div>
   <br />
-  <Number selectNumbers = {this.state.selectNumbers} selectNumber = {this.selectNumber} />
+  <Number selectNumbers = {selectNumbers} selectNumber = {this.selectNumber} />
 </div>
 )
 }
