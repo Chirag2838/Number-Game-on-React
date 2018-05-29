@@ -18,9 +18,21 @@ return(
 }
 
 const Button = (props) => {
+    let button;
+    switch(props.answerIsCorrect){
+        case true :
+            button = <button className="btn btn-success"><i className="fa fa-check"></i></button>;
+            break;
+        case false :
+            button = <button className="btn btn-danger"><i className="fa fa-times"></i></button>;
+            break;
+        default : 
+            button = <button className="btn" onClick={props.checkNumber} disabled = {props.selectNumbers.length === 0}>=</button>;
+            break;
+    }
 return(
 <div className="col-2">
-  <button className="btn" disabled={props.selectNumbers.length === 0}>=</button>
+  {button}
 </div>
 )
 }
@@ -52,7 +64,8 @@ Number.list = _.range(1,10);
 class Game extends React.Component {
     state = {
         selectNumbers : [],
-        numberOfStars : 1 + Math.floor(Math.random()*9)
+        numberOfStars : 1 + Math.floor(Math.random()*9),
+        answerIsCorrect : null
     }
 selectNumber = (clickNumber) => {
     if(this.state.selectNumbers.indexOf(clickNumber) >= 0){return;}
@@ -67,14 +80,20 @@ unselect = (clickNumber) => {
     }));
 }
 
+checkNumber = () => {
+    this.setState(prevState => ({
+        answerIsCorrect : prevState.numberOfStars === prevState.selectNumbers.reduce((acc, n) => acc+n, 0)
+    }));
+}
+
 render(){
-    const{selectNumbers, numberOfStars} = this.state;
+    const{selectNumbers, numberOfStars, answerIsCorrect} = this.state;
 return(
 <div>
   <h3>Play Nine</h3>
   <div className="row">
     <Stars numberOfStars = {numberOfStars}/>
-    <Button selectNumbers = {selectNumbers}/>
+    <Button selectNumbers = {selectNumbers} answerIsCorrect ={answerIsCorrect} checkNumber = {this.checkNumber}/>
     <Answer selectNumbers = {selectNumbers} unselect={this.unselect}/>
   </div>
   <br />
